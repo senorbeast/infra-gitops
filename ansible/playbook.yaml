@@ -3,9 +3,9 @@
 - name: Configure Kubernetes Home Server
   hosts: all
   become: yes
-  vars_files:
-    - roles/k3s/vars/main.yaml
-
+  vars: # Add this variables section
+    k3s_version: "v1.27.6+k3s1"
+    argocd_version: "v2.8.4"
   tasks:
     - name: Update apt cache
       apt:
