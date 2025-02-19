@@ -1,0 +1,10 @@
+# kustomize/base/k3s/storage-class.yaml
+# For defining persistent volume storage class - crucial for PVCs
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path
+provisioner: rancher.io/local-path
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
