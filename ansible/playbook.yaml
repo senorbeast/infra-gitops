@@ -1,0 +1,61 @@
+---
+# Home Server Bootstrap Playbook
+- name: Configure Kubernetes Home Server
+  hosts: all
+  become: yes
+  vars_files:
+    - roles/k3s/vars/main.yaml
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install base packages
+      apt:
+        name: ["curl", "git", "ufw", "zram-tools"]
+        state: present
+
+    - name: Configure UFW firewall
+      ufw:
+        rule: "{{ item.rule }}"
+        port: "{{ item.port }}"
+        proto: tcp
+      loop:
+        - { rule: allow, port: 22 }
+        - { rule: allow, port: 6443 }
+        - { rule: allow, port: 80 }
+        - { rule: allow, port: 443 }
+      notify: Enable UFW
+
+    - name: Install k3s with custom options
+      shell: |
+        curl -sfL https://get.k3s.io | \
+        INSTALL_K3S_VERSION={{ k3s_version }} \
+        INSTALL_K3S_EXEC="--disable traefik \
+        --write-kubeconfig-mode 644 \
+        --etcd-snapshot-schedule-cron='*/30 * * * *' \
+        --etcd-snapshot-retention=10" sh -
+      register: k3s_install
+      changed_when: "'already installed' not in k3s_install.stderr"
+
+    - name: Configure zram swap
+      copy:
+        dest: /etc/default/zramswap
+        content: |
+          ALGO=lz4
+          PERCENT=50
+          PRIORITY=100
+
+    - name: Start zram service
+      systemd:
+        name: zramswap
+        enabled: yes
+        state: restarted
+
+  handlers:
+    - name: Enable UFW
+      ufw:
+        state: enabled
+        policy: deny
