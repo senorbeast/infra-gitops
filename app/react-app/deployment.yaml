@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: react
-          image: ghcr.io/your-username/react-app:latest
+          image: hrish14/cubbr_d:latest
           ports:
             - containerPort: 3000
           readinessProbe:
