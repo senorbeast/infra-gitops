@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Include base configurations
+bases:
+  - ../../base/argocd
+  - ../../base/k3s
+
+# Add production-specific resources
+resources:
+  - metallb.yaml
+
+# Optional: Patch existing resources
+patchesStrategicMerge:
+  - argocd-ingress-patch.yaml
