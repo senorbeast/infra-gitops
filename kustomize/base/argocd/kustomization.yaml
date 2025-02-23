@@ -2,3 +2,13 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/v2.8.4/manifests/install.yaml
+# fixed by
+
+# # Create argocd namespace
+#kubectl create namespace argocd
+
+# Apply Argo CD manifests directly
+#kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.8.4/manifests/install.yaml
+
+# Wait for pods to be ready
+#kubectl wait -n argocd --for=condition=Ready pods --all --timeout=300s
