@@ -17,12 +17,35 @@ Production-grade Kubernetes home server with full GitOps workflow.
 - 4GB+ RAM (8GB recommended)
 - SSD for Kubernetes workloads
 - Static IP address
+- Ensure **Ansible is installed** on your local machine:
+  ```sh
+  sudo apt install ansible  # For Debian/Ubuntu
+  brew install ansible      # For macOS
+  ```
+- SSH access to the remote server.
+- A valid **inventory file** (`inventory`) with your server details.
+
+---
 
 ## Quick Start
 
+## **1️⃣ Install & Configure K3s on Remote Server**
+
+Run the following command to set up K3s:
+
+```sh
+ansible-playbook -i ansible/inventory ansible/home-server.yaml
+```
+
+This will:  
+✔ Install required packages  
+✔ Set up firewall rules  
+✔ Install K3s with custom options  
+✔ Configure ZRAM swap
+
+---
+
 ```bash
-# Bootstrap server
-ansible-playbook -i ansible/inventory ansible/playbook.yaml
 
 # Deploy base infrastructure
 kustomize build k3s/base | kubectl apply -f -
@@ -34,6 +57,24 @@ kustomize build argo/base | kubectl apply -f -
 # Access Argo CD UI
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+
+## **2️⃣ Retrieve K3s Kubeconfig for Local Access**
+
+Run this command to copy the kubeconfig file and set up an SSH tunnel:
+
+```sh
+ansible-playbook -i ansible/inventory ansible/k9s-kubeconfig.yaml
+```
+
+This will:  
+✔ Fetch the kubeconfig from the remote server  
+✔ Modify it to work with an SSH tunnel  
+✔ Start an SSH tunnel for Kubernetes API access
+
+```sh
+# Now just run k9s on local machine (to see your server k3s setup)
+k9s
 ```
 
 ````
@@ -136,3 +177,43 @@ MIT License - See [LICENSE](LICENSE) for details.
 This implementation provides a production-ready home server with full GitOps capabilities while maintaining minimal resource usage. All components can be managed through the Git repository with full audit history.
 
 ````
+
+Here’s a simple **README.md** for your Ansible setup:
+
+---
+
+### **Ansible K3s Setup and Kubeconfig Fetcher**
+
+This project contains Ansible playbooks to:
+
+1. **Install & configure K3s** on a remote server.
+2. **Retrieve the K3s kubeconfig** to set up local access.
+
+---
+
+## **Inventory File Example (`inventory`)**
+
+Ensure your `inventory` file is correctly set up:
+
+```ini
+[server]
+my_server ansible_host=192.168.0.113 ansible_user=beasty
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+```
+
+Replace `192.168.0.113` and `beasty` with your actual server IP and user.
+
+---
+
+## **Usage Notes**
+
+- Run both playbooks in order (`playbook.yaml` first, then `kubeconfig.yaml`).
+- The SSH tunnel will allow `kubectl` to communicate with your K3s cluster via `127.0.0.1:6443`.
+- To confirm everything is working, run:
+  ```sh
+  kubectl get nodes
+  ```
+
+🚀 **You're all set!** 🚀
