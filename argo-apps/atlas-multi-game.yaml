@@ -1,0 +1,20 @@
+# This tells ArgoCD to track the apps/../overlays/production/ directory.
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: atlas-multi-game
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/senorbeast/gitops.git
+    targetRevision: main
+    path: apps/atlas-multi-game/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: atlas-multi-game
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

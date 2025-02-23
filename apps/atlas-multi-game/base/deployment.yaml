@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-multi-game
+  namespace: atlas-multi-game
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: atlas-multi-game
+  template:
+    metadata:
+      labels:
+        app: atlas-multi-game
+    spec:
+      containers:
+        - name: atlas-multi-game
+          image: ghcr.io/senorbeast/atlas-multi-game:latest
+          ports:
+            - containerPort: 3000
