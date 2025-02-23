@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-multi-game
+  namespace: atlas-multi-game
+spec:
+  replicas: 4 # Scale up for production
+  template:
+    spec:
+      containers:
+        - name: atlas-multi-game
+          image: ghcr.io/senorbeast/atlas-multi-game:latest
+          env:
+            - name: NODE_ENV
+              value: "production"

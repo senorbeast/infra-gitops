@@ -1,5 +1,5 @@
 [server]
-your_server_ip ansible_user=ubuntu
+my_server ansible_host=192.168.0.55 ansible_user=beasty
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
