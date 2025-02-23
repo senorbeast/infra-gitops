@@ -31,7 +31,7 @@ Production-grade Kubernetes home server with full GitOps workflow.
 
 ## **1️⃣ Install & Configure K3s on Remote Server**
 
-Run the following command to set up K3s:
+Run the following command to set up K3s, after SSHing:
 
 ```sh
 ansible-playbook -i ansible/inventory ansible/home-server.yaml
