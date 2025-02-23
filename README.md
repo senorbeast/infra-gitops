@@ -53,6 +53,7 @@ kustomize build k3s/overlays/production | kubectl apply -f -
 
 # Install Argo CD
 kustomize build argo/base | kubectl apply -f -
+kubectl wait -n argocd --for=condition=Ready pods --all --timeout=300s
 
 # Access Argo CD UI
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
