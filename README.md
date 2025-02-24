@@ -88,6 +88,7 @@ k9s
 ## 🔄 After Restart Guide
 
 After restarting the server, follow these steps to restore access:
+Or Check the tmux-ssh-setup.md to automate this
 
 1. **SSH into the server** with agent forwarding enabled:
 
