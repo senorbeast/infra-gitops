@@ -1,52 +1,55 @@
 # Home Server GitOps Platform
 
-Production-grade Kubernetes home server with full GitOps workflow.
+A **production-grade Kubernetes home server** with a full **GitOps workflow**.
 
-## Features
+## 🚀 Features
 
-- 🔒 Secure SSH access with automatic key rotation
-- ☸️ Lightweight k3s Kubernetes cluster
-- 🔄 Argo CD GitOps with auto-sync
-- 📊 Monitoring stack (Prometheus/Grafana)
-- 💾 Persistent storage with local-path provisioner
-- 🤖 Automated backups and disaster recovery
+- 🔒 **Secure SSH Access** with automatic key rotation
+- ☸️ **Lightweight k3s Kubernetes Cluster**
+- 🔄 **Argo CD GitOps** with automatic synchronization
+- 📊 **Monitoring Stack** (Prometheus & Grafana)
+- 💾 **Persistent Storage** using the Local-Path Provisioner
+- 🤖 **Automated Backups** and disaster recovery
 
-## Prerequisites
+---
 
-- Ubuntu 22.04 LTS Server
-- 4GB+ RAM (8GB recommended)
-- SSD for Kubernetes workloads
-- Static IP address
-- Ensure **Ansible is installed** on your local machine:
+## 📌 Prerequisites
+
+Ensure you have the following before setting up the home server:
+
+- **Ubuntu 22.04 LTS Server**
+- **4GB+ RAM** (8GB recommended)
+- **SSD** for optimal Kubernetes performance
+- **Static IP Address**
+- **SSH access** to the remote server
+- **Ansible installed** on your local machine:
   ```sh
   sudo apt install ansible  # For Debian/Ubuntu
   brew install ansible      # For macOS
   ```
-- SSH access to the remote server.
-- A valid **inventory file** (`inventory`) with your server details.
+- A valid **inventory file (`inventory`)** containing your server details.
 
 ---
 
-## Quick Start
+## ⚡ Quick Start
 
-## **1️⃣ Install & Configure K3s on Remote Server**
+### **1️⃣ Install & Configure K3s on Remote Server**
 
-Run the following command to set up K3s, after SSHing:
+Run the following command **after SSHing into the server**:
 
 ```sh
 ansible-playbook -i ansible/inventory ansible/home-server.yaml
 ```
 
-This will:  
+This will:
 ✔ Install required packages  
 ✔ Set up firewall rules  
 ✔ Install K3s with custom options  
 ✔ Configure ZRAM swap
 
----
+### **2️⃣ Deploy Base Infrastructure & Argo CD**
 
-```bash
-
+```sh
 # Deploy base infrastructure
 kustomize build k3s/base | kubectl apply -f -
 kustomize build k3s/overlays/production | kubectl apply -f -
@@ -55,32 +58,34 @@ kustomize build k3s/overlays/production | kubectl apply -f -
 kustomize build argo/base | kubectl apply -f -
 kubectl wait -n argocd --for=condition=Ready pods --all --timeout=300s
 
-# Access Argo CD UI
+# Retrieve Argo CD Admin Password
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+# Port-forward to access Argo CD UI
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 ```
 
-## **2️⃣ Retrieve K3s Kubeconfig for Local Access**
+### **3️⃣ Retrieve K3s Kubeconfig for Local Access**
 
-Run this command to copy the kubeconfig file and set up an SSH tunnel:
+Run the following command to fetch the `kubeconfig` and set up an SSH tunnel:
 
 ```sh
 ansible-playbook -i ansible/inventory ansible/k9s-kubeconfig.yaml
 ```
 
-This will:  
-✔ Fetch the kubeconfig from the remote server  
-✔ Modify it to work with an SSH tunnel  
+This will:
+✔ Fetch the `kubeconfig` from the remote server  
+✔ Modify it for SSH tunnel usage  
 ✔ Start an SSH tunnel for Kubernetes API access
 
 ```sh
-# Now just run k9s on local machine (to see your server k3s setup)
+# Now use k9s to manage your K3s cluster
 k9s
 ```
 
-````
+---
 
-## Architecture
+## 🏗 Architecture
 
 ```mermaid
 graph TD
@@ -92,129 +97,103 @@ graph TD
     G[Local Network] -->|LB IP| F
 ```
 
-## Maintenance
+---
 
-**Backup etcd**:
+## 🛠 Maintenance
 
-```bash
+### **Backup etcd**
+
+```sh
 ./scripts/backup-etcd.sh
 ```
 
-**Upgrade k3s**:
+### **Upgrade K3s**
 
-```bash
+```sh
 ansible-playbook -i ansible/inventory ansible/playbook.yaml --tags k3s-upgrade
 ```
 
-**Monitor Resources**:
+### **Monitor Resource Usage**
 
-```bash
+```sh
 kubectl top pods --all-namespaces
 ```
 
-## Security Best Practices
+---
 
-1. Enable Argo CD SSO integration
-2. Rotate admin password after initial setup
-3. Use network policies to isolate workloads
-4. Enable automatic security updates
-5. Regular vulnerability scans with Trivy
+## 🔒 Security Best Practices
 
-## Troubleshooting
+1. **Enable Argo CD SSO Integration** for authentication
+2. **Rotate Admin Password** after initial setup
+3. **Use Network Policies** to isolate workloads
+4. **Enable Automatic Security Updates**
+5. **Perform Regular Vulnerability Scans** using [Trivy](https://github.com/aquasecurity/trivy)
 
-**Argo CD Sync Issues**:
+---
 
-```bash
+## 🛠 Troubleshooting
+
+### **Argo CD Sync Issues**
+
+```sh
 argocd app get <app-name> --hard-refresh
 ```
 
-**Node Resource Exhaustion**:
+### **Node Resource Exhaustion**
 
-```bash
+```sh
 kubectl describe node | grep -A 3 Allocated
 ```
 
-**Persistent Volume Recovery**:
+### **Persistent Volume Recovery**
 
-```bash
+```sh
 sudo ls -lh /var/lib/rancher/k3s/storage
 ```
 
-## License
+---
 
-MIT License - See [LICENSE](LICENSE) for details.
+## 📜 License
 
-```
-
-**Key Components Explained**:
-
-1. **Ansible Automation**:
-   - Handles OS hardening and k3s installation
-   - Configures zram for memory optimization
-   - Sets up automated etcd snapshots
-
-2. **Kustomize Layers**:
-   - Base configuration for cluster essentials
-   - Production overlay with MetalLB load balancer
-   - Environment-specific patches
-
-3. **Argo CD GitOps**:
-   - App-of-Apps pattern for managing deployments
-   - Automatic synchronization every 3 minutes
-   - Self-healing capabilities
-
-4. **Monitoring Stack**:
-   - Prometheus with 15-day retention
-   - Grafana with preconfigured dashboards
-   - Alertmanager for critical notifications
-
-**Post-Installation Steps**:
-
-1. Configure DNS records for your services
-2. Set up OAuth2 proxy for Argo CD access
-3. Enable encrypted backups to cloud storage
-4. Configure network policies for pod isolation
-
-This implementation provides a production-ready home server with full GitOps capabilities while maintaining minimal resource usage. All components can be managed through the Git repository with full audit history.
-
-````
-
-Here’s a simple **README.md** for your Ansible setup:
+This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
 
 ---
 
-### **Ansible K3s Setup and Kubeconfig Fetcher**
+## 🔑 Key Components Explained
 
-This project contains Ansible playbooks to:
+### 1️⃣ **Ansible Automation**
 
-1. **Install & configure K3s** on a remote server.
-2. **Retrieve the K3s kubeconfig** to set up local access.
+- Handles **OS hardening** and **K3s installation**
+- Configures **ZRAM** for memory optimization
+- Sets up **automated etcd snapshots**
+
+### 2️⃣ **Kustomize Layers**
+
+- **Base Configuration** for essential cluster components
+- **Production Overlay** with MetalLB load balancer
+- **Environment-Specific Patches** for flexibility
+
+### 3️⃣ **Argo CD GitOps Workflow**
+
+- **App-of-Apps Pattern** for managing deployments
+- **Automatic Synchronization** every 3 minutes
+- **Self-Healing** capabilities
+
+### 4️⃣ **Monitoring Stack**
+
+- **Prometheus** with 15-day data retention
+- **Grafana** with preconfigured dashboards
+- **Alertmanager** for critical notifications
 
 ---
 
-## **Inventory File Example (`inventory`)**
+## ✅ Post-Installation Steps
 
-Ensure your `inventory` file is correctly set up:
+1. **Configure DNS records** for your services
+2. **Set up OAuth2 Proxy** for Argo CD access
+3. **Enable Encrypted Backups** to cloud storage
+4. **Implement Network Policies** for pod isolation
 
-```ini
-[server]
-my_server ansible_host=192.168.0.113 ansible_user=beasty
+This setup provides a **production-ready home server** with **full GitOps capabilities** while maintaining **minimal resource usage**. All components are managed through the **Git repository**, ensuring full **audit history** and **version control**.
 
-[all:vars]
-ansible_python_interpreter=/usr/bin/python3
-```
-
-Replace `192.168.0.113` and `beasty` with your actual server IP and user.
-
----
-
-## **Usage Notes**
-
-- Run both playbooks in order (`playbook.yaml` first, then `kubeconfig.yaml`).
-- The SSH tunnel will allow `kubectl` to communicate with your K3s cluster via `127.0.0.1:6443`.
-- To confirm everything is working, run:
-  ```sh
-  kubectl get nodes
-  ```
-
-🚀 **You're all set!** 🚀
+🚀 **Enjoy your Kubernetes Home Server!** 🚀
