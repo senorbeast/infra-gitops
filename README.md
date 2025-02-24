@@ -98,15 +98,18 @@ After restarting the server, follow these steps to restore access:
 2. **Port-forward Argo CD UI to local machine:**
 
    ```sh
-   kubectl port-forward svc/argocd-server -n argocd 8080:443
+   kubectl port-forward svc/argocd-server -n argocd 8080:443 # Run on host
+   ```
+
+   ```sh
+   ssh -L 8080:localhost:8080 beasty@192.168.0.55  # Run locally
    ```
 
    - Access Argo CD UI at: [https://localhost:8080](https://localhost:8080)
 
-3. **Port-forward ArgoCD, K3s API to local machine:**
+3. **Port-forward K3s API to local machine:**
 
    ```sh
-   ssh -L 8080:localhost:8080 beasty@192.168.0.55
    ssh -L 6443:localhost:6443 user@your-server-ip -N
    ```
 
