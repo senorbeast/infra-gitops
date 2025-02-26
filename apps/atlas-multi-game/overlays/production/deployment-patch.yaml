@@ -9,7 +9,7 @@ spec:
     spec:
       containers:
         - name: atlas-multi-game
-          image: ghcr.io/senorbeast/atlas-multi-game:
+          image: 
           env:
             - name: NODE_ENV
               value: "production"
