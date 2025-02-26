@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/senorbeast/gitops.git
+    repoURL: https://github.com/senorbeast/infra-gitops.git
     targetRevision: main
     path: apps/atlas-multi-game/overlays/production
   destination:
