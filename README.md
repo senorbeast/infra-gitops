@@ -4,12 +4,12 @@ A **production-grade Kubernetes home server** with a full **GitOps workflow**.
 
 ## 🚀 Features
 
-- 🔒 **Secure SSH Access** with automatic key rotation
-- ☸️ **Lightweight k3s Kubernetes Cluster**
-- 🔄 **Argo CD GitOps** with automatic synchronization
-- 📊 **Monitoring Stack** (Prometheus & Grafana)
-- 💾 **Persistent Storage** using the Local-Path Provisioner
-- 🤖 **Automated Backups** and disaster recovery
+- 🔒 **Secure SSH Access** with automatic key rotation **(TODO)**
+- ☸️ **Lightweight k3s Kubernetes Cluster** ✅
+- 🔄 **Argo CD GitOps** with automatic synchronization ✅
+- 📊 **Monitoring Stack** (Prometheus & Grafana) **(TODO)**
+- 💾 **Persistent Storage** using the Local-Path Provisioner **(TODO)**
+- 🤖 **Automated Backups** and disaster recovery **(TODO)**
 
 ---
 
